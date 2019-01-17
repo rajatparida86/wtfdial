@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/rajatparida86/wtfdial"
 )
@@ -20,6 +22,15 @@ func MarshalDial(dial *wtf.Dial) ([]byte, error) {
 	return bytes, nil
 }
 
-func UnMarshalDial() {
-
+func UnMarshalDial(bytes []byte) (*wtf.Dial, error) {
+	var protobuf Dial
+	if err := proto.Unmarshal(bytes, &protobuf); err != nil {
+		return nil, err
+	}
+	var dial wtf.Dial
+	dial.ID = int(protobuf.GetID())
+	dial.UserID = int(protobuf.GetUserID())
+	dial.Status = protobuf.GetStatus()
+	dial.ModifiedTime = time.Unix(0, protobuf.GetModifiedTime())
+	return &dial, nil
 }
