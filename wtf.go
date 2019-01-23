@@ -15,7 +15,7 @@ type Dial struct {
 }
 
 type Authenticator interface {
-	Authenticate(token string) *User
+	Authenticate(token string) (*User, error)
 }
 
 type DialService interface {

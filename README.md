@@ -27,13 +27,13 @@ $ protoc --version
 
 #### On Linux
 ```
-$wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.bz2
-$tar xvf protobuf-2.5.0.tar.bz2
-$cd protobuf-2.5.0
-$./configure CC=clang CXX=clang++ CXXFLAGS='-std=c++11 -stdlib=libc++ -O3 -g' LDFLAGS='-stdlib=libc++' LIBS="-lc++ -lc++abi"
-$make -j 4
-$sudo make install
-$protoc --version
+$ wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.bz2
+$ tar xvf protobuf-2.5.0.tar.bz2
+$ cd protobuf-2.5.0
+$ ./configure CC=clang CXX=clang++ CXXFLAGS='-std=c++11 -stdlib=libc++ -O3 -g' LDFLAGS='-stdlib=libc++' LIBS="-lc++ -lc++abi"
+$ make -j 4
+$ sudo make install
+$ protoc --version
 ```
 
 ### Install gogo protobuf and extensions
@@ -41,4 +41,9 @@ $protoc --version
 $ go get github.com/gogo/protobuf/proto
 $ go get github.com/gogo/protobuf/protoc-gen-gogo
 $ go get github.com/gogo/protobuf/gogoproto
+```
+
+### Install boltdb
+```
+$ go get github.com/boltdb/bolt
 ```
