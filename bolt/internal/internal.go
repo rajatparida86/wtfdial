@@ -9,6 +9,7 @@ import (
 
 //go:generate protoc --gogo_out=. internal.proto
 
+// MarshalDial -- Marshal wtf.Dial to byte array
 func MarshalDial(dial *wtf.Dial) ([]byte, error) {
 	bytes, err := proto.Marshal(&Dial{
 		ID:           proto.Int64(int64(dial.ID)),
@@ -22,6 +23,7 @@ func MarshalDial(dial *wtf.Dial) ([]byte, error) {
 	return bytes, nil
 }
 
+// UnMarshalDial -- Converts byte array to wtf.Dial
 func UnMarshalDial(bytes []byte) (*wtf.Dial, error) {
 	var protobuf Dial
 	if err := proto.Unmarshal(bytes, &protobuf); err != nil {
