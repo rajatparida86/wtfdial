@@ -37,14 +37,14 @@ func (d *DialService) CreateDial(dial *wtf.Dial) error {
 		return err
 	}
 	//Prepare the new Dial
-	dial.ID = int(dialID)
+	dial.ID = wtf.DialID(dialID)
 	dial.UserID = user.ID
 	dial.ModifiedTime = d.session.now
 
 	// Marshal the Dial object and put into BoltDB bucket
 	if dialproto, err := internal.MarshalDial(dial); err != nil {
 		return err
-	} else if err := dials.Put(itob(dial.ID), dialproto); err != nil {
+	} else if err := dials.Put(itob(int(dial.ID)), dialproto); err != nil {
 		return err
 	}
 

@@ -2,14 +2,16 @@ package wtf
 
 import "time"
 
+type UserID int
 type User struct {
-	ID       int `json:"id"`
-	UserName int `json:"username"`
+	ID       UserID `json:"id"`
+	UserName int    `json:"username"`
 }
 
+type DialID int
 type Dial struct {
-	ID           int       `json:"Id"`
-	UserID       int       `json:"userId"`
+	ID           DialID    `json:"Id"`
+	UserID       UserID    `json:"userId"`
 	Status       float64   `json:"status"`
 	ModifiedTime time.Time `json:"lastModified"`
 }

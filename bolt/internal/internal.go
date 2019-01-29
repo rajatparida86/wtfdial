@@ -30,8 +30,8 @@ func UnMarshalDial(bytes []byte) (*wtf.Dial, error) {
 		return nil, err
 	}
 	var dial wtf.Dial
-	dial.ID = int(protobuf.GetID())
-	dial.UserID = int(protobuf.GetUserID())
+	dial.ID = wtf.DialID(protobuf.GetID())
+	dial.UserID = wtf.UserID(protobuf.GetUserID())
 	dial.Status = protobuf.GetStatus()
 	dial.ModifiedTime = time.Unix(0, protobuf.GetModifiedTime())
 	return &dial, nil
