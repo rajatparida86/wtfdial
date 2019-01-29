@@ -75,9 +75,8 @@ func TestDialService_SetStatus_ErrUnauthorized(t *testing.T) {
 	testcases := []struct {
 		dial   wtf.Dial
 		userID int
-		err    error
 	}{
-		{wtf.Dial{Name: "Dial1", Status: 50}, 23, wtf.NewAuthenticationError("Dial doesn't belong to the user.")},
+		{wtf.Dial{Name: "Dial1", Status: 50}, 23},
 	}
 
 	for _, test := range testcases {
@@ -89,9 +88,12 @@ func TestDialService_SetStatus_ErrUnauthorized(t *testing.T) {
 		}
 		unAuthorizedSession := client.Connect()
 		err := unAuthorizedSession.DialService().SetStatus(1, test.dial.ID)
+		if err == nil {
+			t.Fatalf("Expected error. Got error:%v", err)
+		}
 
 		if _, ok := err.(*wtf.AuthenticationError); !ok {
-			t.Fatalf("Expected: %t, Got: %t", test.err, err)
+			t.Fatalf("Expected: Authetication error, Got: %t", err)
 		}
 	}
 }
