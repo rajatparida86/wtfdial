@@ -1,0 +1,13 @@
+package internal;
+
+message Dial{
+  optional int64 ID = 1;
+  optional int64 UserID = 2;
+  optional double Status = 3;
+  optional int64 ModifiedTime = 4;
+}
+
+message User{
+  optional int64 ID = 1;
+  optional string UserName = 2;
+}
