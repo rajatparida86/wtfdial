@@ -15,6 +15,7 @@ func MarshalDial(dial *wtf.Dial) ([]byte, error) {
 		ID:           proto.Int64(int64(dial.ID)),
 		UserID:       proto.Int64(int64(dial.UserID)),
 		Status:       proto.Float64(float64(dial.Status)),
+		Name:         proto.String(dial.Name),
 		ModifiedTime: proto.Int64(dial.ModifiedTime.UnixNano()),
 	})
 	if err != nil {
@@ -33,6 +34,7 @@ func UnMarshalDial(bytes []byte) (*wtf.Dial, error) {
 	dial.ID = wtf.DialID(protobuf.GetID())
 	dial.UserID = wtf.UserID(protobuf.GetUserID())
 	dial.Status = protobuf.GetStatus()
-	dial.ModifiedTime = time.Unix(0, protobuf.GetModifiedTime())
+	dial.Name = protobuf.GetName()
+	dial.ModifiedTime = time.Unix(0, protobuf.GetModifiedTime()).UTC()
 	return &dial, nil
 }

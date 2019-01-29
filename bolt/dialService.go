@@ -52,7 +52,7 @@ func (d *DialService) CreateDial(dial *wtf.Dial) error {
 }
 
 // GetDial ... Gets a Dial from "Dials" bucket for a given dialId
-func (d *DialService) GetDial(dialID int) (*wtf.Dial, error) {
+func (d *DialService) GetDial(dialID wtf.DialID) (*wtf.Dial, error) {
 	// Create non writable transaction
 	tx, err := d.session.db.Begin(false)
 	if err != nil {
@@ -61,7 +61,7 @@ func (d *DialService) GetDial(dialID int) (*wtf.Dial, error) {
 	defer tx.Rollback()
 	// Read the dial from bucket and unmarshal
 	dial := &wtf.Dial{}
-	if dialProto := tx.Bucket([]byte(dials)).Get(itob(dialID)); dialProto == nil {
+	if dialProto := tx.Bucket([]byte(dials)).Get(itob(int(dialID))); dialProto == nil {
 		return nil, nil
 	} else if dial, err = internal.UnMarshalDial(dialProto); err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (d *DialService) GetDial(dialID int) (*wtf.Dial, error) {
 }
 
 // SetStatus ... Sets the status for a dial
-func (d *DialService) SetStatus(status float64, dialID int) error {
+func (d *DialService) SetStatus(status float64, dialID wtf.DialID) error {
 	user, err := d.session.Authenticate()
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (d *DialService) SetStatus(status float64, dialID int) error {
 	defer tx.Rollback()
 
 	bucket := tx.Bucket([]byte(dials))
-	if err := bucket.Put(itob(dialID), dialProto); err != nil {
+	if err := bucket.Put(itob(int(dialID)), dialProto); err != nil {
 		return err
 	}
 
