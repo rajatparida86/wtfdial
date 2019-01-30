@@ -13,7 +13,7 @@ type Session struct {
 	user          *wtf.User
 	authenticator wtf.Authenticator
 	token         string
-	dialService   *DialService
+	dialService   DialService
 }
 
 func newSession(db *bolt.DB) *Session {
@@ -37,3 +37,5 @@ func (s *Session) Authenticate() (*wtf.User, error) {
 	s.user = u
 	return u, nil
 }
+
+func (s *Session) DialService() *DialService { return &s.dialService }

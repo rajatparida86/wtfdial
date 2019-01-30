@@ -5,7 +5,7 @@ import "time"
 type UserID int
 type User struct {
 	ID       UserID `json:"id"`
-	UserName int    `json:"username"`
+	UserName string `json:"username"`
 }
 
 type DialID int
@@ -14,6 +14,7 @@ type Dial struct {
 	UserID       UserID    `json:"userId"`
 	Status       float64   `json:"status"`
 	ModifiedTime time.Time `json:"lastModified"`
+	Name         string
 }
 
 type Authenticator interface {

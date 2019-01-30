@@ -14,6 +14,14 @@ type Client struct {
 	Now           func() time.Time
 }
 
+func NewClient() *Client {
+	client := &Client{
+		Now: time.Now,
+	}
+	return client
+}
+
+// Open ... Opens a BoltDB connection and creates the Dials bucket
 func (c *Client) Open() error {
 	// Open connectin to BoltDB
 	db, err := bolt.Open(c.Path, 0666, &bolt.Options{Timeout: 1 * time.Second})
@@ -35,10 +43,18 @@ func (c *Client) Open() error {
 	return tx.Commit()
 }
 
-// Create a session
+// Connect ... Create a session
 func (c *Client) Connect() *Session {
 	session := newSession(c.db)
 	session.authenticator = c.Authenticator
 	session.now = c.Now()
 	return session
+}
+
+// Close ... Closes a BoltDB connection
+func (c *Client) Close() error {
+	if c.db != nil {
+		return c.db.Close()
+	}
+	return nil
 }
