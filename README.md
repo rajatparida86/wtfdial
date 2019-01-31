@@ -36,14 +36,20 @@ $ sudo make install
 $ protoc --version
 ```
 
-### Install gogo protobuf and extensions
+### Dependencies
+#### gogo protobuf and extensions
 ```
 $ go get github.com/gogo/protobuf/proto
 $ go get github.com/gogo/protobuf/protoc-gen-gogo
 $ go get github.com/gogo/protobuf/gogoproto
 ```
 
-### Install boltdb
+#### boltdb
 ```
 $ go get github.com/boltdb/bolt
+```
+
+#### Github authentication
+```
+$ go get github.com/google/go-github/github
 ```
