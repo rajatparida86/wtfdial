@@ -47,3 +47,8 @@ $ go get github.com/gogo/protobuf/gogoproto
 ```
 $ go get github.com/boltdb/bolt
 ```
+
+### Install testify for testing
+```
+$ go get github.com/stretchr/testify/assert
+```

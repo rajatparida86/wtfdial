@@ -1,99 +1,115 @@
 package bolt_test
 
 import (
-	"github.com/rajatparida86/wtfdial"
-	"reflect"
 	"testing"
+
+	"github.com/rajatparida86/wtfdial"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestDialService_SetStatus ... Test Dial creation
 func TestDialService_CreateDial(t *testing.T) {
+	testCases := []struct {
+		dial          wtf.Dial
+		expectedError error
+	}{
+		{wtf.Dial{Name: "Dial1", Status: 50, Token: "xxx"}, nil},
+		{wtf.Dial{ID: 1, Name: "Dial2", Status: 45, Token: "xxx"}, &wtf.ErrDialAlreadyExists{}},
+	}
+
 	client := OpenClient()
 	defer client.Close()
 	// Create a session and get the dialService
-	ds := client.Connect().DialService()
+	ds := client.DialService()
 
+	for _, test := range testCases {
+		if err := ds.CreateDial(&test.dial); err != nil {
+			assert.IsType(t, test.expectedError, err)
+		}
+	}
+}
+
+// TestDialService_CreateDial_Dial_Exists -- Test Existing dial cannot be created
+func TestDialService_CreateDial_Dial_Exists(t *testing.T) {
+	client := OpenClient()
+	defer client.Close()
+	ds := client.DialService()
 	dial := wtf.Dial{
+		Token:  "xxx",
 		Name:   "Test Dial",
 		Status: 50,
 	}
-
 	if err := ds.CreateDial(&dial); err != nil {
 		t.Fatal(err)
-	} else if dial.ID != 1 {
-		t.Fatalf("Expected Id to be: %d, Got: %d", 1, dial.ID)
-	} else if dial.UserID != 100 {
-		t.Fatalf("Expected Dials owner's ID to be: %d, Got: %d", 100, dial.UserID)
 	}
-	retrievedDial, err := ds.GetDial(1)
-	if err != nil {
+	if err := ds.CreateDial(&dial); err == nil {
 		t.Fatal(err)
-	} else if !reflect.DeepEqual(retrievedDial, &dial) {
-		t.Fatalf("Expected dial:%#v , Got dial: %#v", &dial, retrievedDial)
+	} else if _, ok := err.(*wtf.ErrDialAlreadyExists); !ok {
+		t.Fatalf("Expected ErrDialAlreadyExists. Got error:%t", err)
+	}
+}
+
+// TestDialService_GetDial-- Test get dial
+func TestDialService_GetDial(t *testing.T) {
+	// Define test cases
+	testcases := []struct {
+		dial             wtf.Dial
+		dialID           wtf.DialID
+		expectedError    error
+		expectedDialName string
+	}{
+		{wtf.Dial{Name: "Dial1", Status: 50, Token: "xxx"}, 1, nil, "Dial1"},
+		{wtf.Dial{Name: "Dial2", Status: 45, Token: "xxx"}, 10, &wtf.ErrDialIdNotFound{}, ""},
+	}
+
+	client := OpenClient()
+	defer client.Close()
+	ds := client.DialService()
+
+	for _, test := range testcases {
+		if err := ds.CreateDial(&test.dial); err != nil {
+			t.Fatal(err)
+		}
+		result, err := ds.GetDial(test.dialID)
+		assert.IsType(t, test.expectedError, err)
+		if err == nil {
+			assert.Equal(t, test.expectedDialName, result.Name)
+		}
 	}
 }
 
 // TestDialService_SetStatus ... Test Dial status update
 func TestDialService_SetStatus(t *testing.T) {
-	client := OpenClient()
-	defer client.Close()
-	ds := client.Connect().DialService()
-
 	// Define test cases
 	testcases := []struct {
-		dial     wtf.Dial
-		expected float64
+		dial           wtf.Dial
+		token          string
+		expectedStatus float64
+		expectedError  error
 	}{
-		{wtf.Dial{Name: "Dial1", Status: 50}, 20},
-		{wtf.Dial{Name: "Dial2", Status: 45}, 10},
+		{wtf.Dial{Name: "Dial1", Status: 50, Token: "xxx"}, "xxx", 20, nil},
+		{wtf.Dial{Name: "Dial2", Status: 45, Token: "yyy"}, "yyy", 10, nil},
+		{wtf.Dial{Name: "Dial3", Status: 18, Token: "zzz"}, "xxx", 10, wtf.NewAuthenticationError("")},
 	}
+
+	client := OpenClient()
+	defer client.Close()
+	ds := client.DialService()
+
 	// Test all test cases
 	for _, test := range testcases {
 		// Create test dial
 		if err := ds.CreateDial(&test.dial); err != nil {
 			t.Fatal(err)
 		} else //Update Dial status
-		if err := ds.SetStatus(test.expected, test.dial.ID); err != nil {
-			t.Fatal(err)
+		if err := ds.SetStatus(test.expectedStatus, test.token, test.dial.ID); err != nil {
+			assert.IsType(t, test.expectedError, err)
 		} else // Retrieve updated dial
 		if updated, err := ds.GetDial(test.dial.ID); err != nil {
 			t.Fatal(err)
-		} else // Match retreived dial status with expected status
-		if updated.Status != test.expected {
-			t.Fatalf("Expected status: %v, Got: %v", test.expected, updated.Status)
-		}
-	}
-}
-
-// TestDialService_SetStatus_ErrUnauthorized ...  Update Dial status with unauthorised user
-func TestDialService_SetStatus_ErrUnauthorized(t *testing.T) {
-	client := OpenClient()
-	defer client.Close()
-	ds := client.Connect().DialService()
-
-	// Define test cases
-	testcases := []struct {
-		dial   wtf.Dial
-		userID int
-	}{
-		{wtf.Dial{Name: "Dial1", Status: 50}, 23},
-	}
-
-	for _, test := range testcases {
-		if err := ds.CreateDial(&test.dial); err != nil {
-			t.Fatal(err)
-		}
-		client.Authenticator.AuthenticateFn = func(token string) (*wtf.User, error) {
-			return &wtf.User{wtf.UserID(test.userID), "test"}, nil
-		}
-		unAuthorizedSession := client.Connect()
-		err := unAuthorizedSession.DialService().SetStatus(1, test.dial.ID)
-		if err == nil {
-			t.Fatalf("Expected error. Got error:%v", err)
-		}
-
-		if _, ok := err.(*wtf.AuthenticationError); !ok {
-			t.Fatalf("Expected: Authetication error, Got: %t", err)
+		} else {
+			// Match retreived dial status with expected status
+			assert.Equal(t, test.expectedStatus, updated.Status)
 		}
 	}
 }
