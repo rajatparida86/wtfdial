@@ -2,13 +2,8 @@ package internal;
 
 message Dial{
   optional int64 ID = 1;
-  optional int64 UserID = 2;
+  optional string Token = 2;
   optional string Name = 3;
   optional double Status = 4;
   optional int64 ModifiedTime = 5;
-}
-
-message User{
-  optional int64 ID = 1;
-  optional string UserName = 2;
 }

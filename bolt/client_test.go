@@ -6,13 +6,11 @@ import (
 	"time"
 
 	"github.com/rajatparida86/wtfdial/bolt"
-	"github.com/rajatparida86/wtfdial/mock"
 )
 
 // Client ... Wrapper for bolt.Client
 type Client struct {
 	*bolt.Client
-	Authenticator mock.Authenticator
 }
 
 // OpenClient ... Creates a new Client wrapper and opens the connection before each test run
@@ -33,12 +31,10 @@ func NewClient() *Client {
 	file.Close()
 
 	client := &Client{
-		Client:        bolt.NewClient(),
-		Authenticator: mock.DefaultAuthenticator(),
+		Client: bolt.NewClient(),
 	}
 	// Mocking
 	client.Path = file.Name()
-	client.Client.Authenticator = &client.Authenticator
 	client.Now = func() time.Time { return Now }
 
 	return client

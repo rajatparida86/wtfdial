@@ -12,14 +12,26 @@ func (e *AuthenticationError) Error() string {
 	return e.err
 }
 
-type DialNotFoundError struct {
+type ErrDialIdNotFound struct {
 	err string
 }
 
-func NewDialNotFoundError(message string) *DialNotFoundError {
-	return &DialNotFoundError{err: message}
+func NewErrDialIdNotFound(message string) *ErrDialIdNotFound {
+	return &ErrDialIdNotFound{err: message}
 }
 
-func (e *DialNotFoundError) Error() string {
+func (e *ErrDialIdNotFound) Error() string {
+	return e.err
+}
+
+type ErrDialAlreadyExists struct {
+	err string
+}
+
+func NewErrDialAlreadyExists(message string) *ErrDialAlreadyExists {
+	return &ErrDialAlreadyExists{err: message}
+}
+
+func (e *ErrDialAlreadyExists) Error() string {
 	return e.err
 }

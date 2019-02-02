@@ -8,16 +8,17 @@ import (
 )
 
 type Client struct {
-	Authenticator wtf.Authenticator
-	Path          string
-	db            *bolt.DB
-	Now           func() time.Time
+	Path        string
+	db          *bolt.DB
+	Now         func() time.Time
+	dialService DialService
 }
 
 func NewClient() *Client {
 	client := &Client{
 		Now: time.Now,
 	}
+	client.dialService.client = client
 	return client
 }
 
@@ -43,18 +44,14 @@ func (c *Client) Open() error {
 	return tx.Commit()
 }
 
-// Connect ... Create a session
-func (c *Client) Connect() *Session {
-	session := newSession(c.db)
-	session.authenticator = c.Authenticator
-	session.now = c.Now()
-	return session
-}
-
 // Close ... Closes a BoltDB connection
 func (c *Client) Close() error {
 	if c.db != nil {
 		return c.db.Close()
 	}
 	return nil
+}
+
+func (c *Client) DialService() wtf.DialService {
+	return &c.dialService
 }
